@@ -5,7 +5,7 @@ module Helpers
     url = 'http://localhost:7474/db/data/cypher'
     response = HTTParty.post(url, headers: resource_headers, body: {query: q}.to_json)
     Neo4j::Session.set_current(nil)
-    raise "can't delete database, #{response}" unless response.code == 200
+    raise "can't delete database, #{response}" unless response.status == 200
   end
 
   def clean_embedded_db

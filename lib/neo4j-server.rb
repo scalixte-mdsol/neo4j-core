@@ -1,4 +1,4 @@
-require 'httparty'
+require 'faraday'
 require 'json'
 require 'neo4j-server/neo4j_server_endpoint'
 require 'neo4j-server/resource'

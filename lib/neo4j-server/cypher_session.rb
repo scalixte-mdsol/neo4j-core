@@ -21,7 +21,7 @@ module Neo4j::Server
       endpoint = Neo4jServerEndpoint.new(params)
       url = endpoint_url || 'http://localhost:7474'
       response = endpoint.get(url)
-      raise "Server not available on #{url} (response code #{response.code})" unless response.code == 200
+      raise "Server not available on #{url} (response status #{response.status})" unless response.status == 200
       
       root_data = JSON.parse(response.body)
       data_url = root_data['data']
@@ -55,7 +55,7 @@ module Neo4j::Server
 
     def initialize_resource(data_url)
       response = @endpoint.get(data_url)
-      expect_response_code(response,200)
+      expect_response_code(response, 200, data_url)
       data_resource = JSON.parse(response.body)
       raise "No data_resource for #{response.body}" unless data_resource
       # store the resource data
@@ -112,8 +112,8 @@ module Neo4j::Server
     end
 
     def indexes(label)
-      response = @endpoint.get("#{@resource_url}schema/index/#{label}")
-      expect_response_code(response, 200)
+      response = @endpoint.get(url = "#{@resource_url}schema/index/#{label}")
+      expect_response_code(response, 200, url)
       data_resource = JSON.parse(response.body)
 
       property_keys = data_resource.map do |row|
@@ -176,7 +176,7 @@ module Neo4j::Server
       else
         url = resource_url('cypher')
         q = params.nil? ? {query: q} : {query: q, params: params}
-        response = @endpoint.post(url, headers: resource_headers, body: q.to_json)
+        response = @endpoint.post(url, headers: resource_headers, body: q.to_json, timeout: 99999999, read_timeout: 99999999)
         CypherResponse.create_with_no_tx(response)
       end
     end

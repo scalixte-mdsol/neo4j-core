@@ -1,23 +1,29 @@
 # borrowed from architect4r
 require 'os'
-require 'httparty'
+require 'faraday'
 require 'zip'
 require File.expand_path("../config_server", __FILE__)
 
 namespace :neo4j do
 
   def download_neo4j(file)
-    if OS::Underlying.windows? then
+    dist_host_url = 'http://dist.neo4j.org'
+
+    download_path = if OS::Underlying.windows? then
       file_name = "neo4j.zip"
-      download_url = "http://dist.neo4j.org/neo4j-#{file}-windows.zip"
+      "neo4j-#{file}-windows.zip"
     else
       file_name = "neo4j-unix.tar.gz"
-      download_url = "http://dist.neo4j.org/neo4j-#{file}-unix.tar.gz"
+      "neo4j-#{file}-unix.tar.gz"
     end
 
     unless File.exist?(file_name)
       # check if file is available
-      status = HTTParty.head(download_url).code
+      connection = Faraday.new(url: dist_host_url) do |faraday|
+        faraday.adapter Faraday.default_adapter
+      end
+
+      status = connection.head(download_path).status
       raise "#{file} is not available to download, try a different version" if status < 200 || status >= 300
 
       df = File.open(file_name, 'wb')
@@ -25,7 +31,7 @@ namespace :neo4j do
 
       success = false
       begin
-        df << HTTParty.get(download_url)
+        df << HTTParty.get(download_path).body
         success = true
       ensure
         df.close()
@@ -37,7 +43,7 @@ namespace :neo4j do
 
     # # http://download.neo4j.org/artifact?edition=community&version=2.1.2&distribution=tarball&dlid=3462770&_ga=1.110610309.1220184053.1399636580
     #
-    # parsed_url = URI.parse(download_url)
+    # parsed_url = URI.parse(download_path)
     #
     # puts "parsed_url.host #{parsed_url.host} port #{parsed_url.port} uri: #{parsed_url.request_uri}"
     # Net::HTTP.start(parsed_url.host, parsed_url.port) do |http|
@@ -51,7 +57,7 @@ namespace :neo4j do
     #   end
     # end
     #
-    # puts "DOWN LOAD URL #{download_url}, exist #{file_name} : #{File.exist?(file_name)}"
+    # puts "DOWN LOAD URL #{download_path}, exist #{file_name} : #{File.exist?(file_name)}"
     #
 
     file_name

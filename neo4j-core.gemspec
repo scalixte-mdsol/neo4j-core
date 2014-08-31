@@ -29,7 +29,7 @@ It comes included with the Apache Lucene document database.
   s.rdoc_options = ["--quiet", "--title", "Neo4j::Core", "--line-numbers", "--main", "README.rdoc", "--inline-source"]
 
   # Not released yet
-  s.add_dependency("httparty")
+  s.add_dependency("faraday")
   s.add_dependency("json")
   s.add_dependency("os")  # for Rake task
   s.add_dependency("zip") # for Rake task

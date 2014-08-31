@@ -2,6 +2,7 @@ module Neo4j::Server
   class Neo4jServerEndpoint
     def initialize(params = {})
       @params = params
+      @connection = Faraday.new
     end
 
     def merged_options(options)
@@ -9,15 +10,15 @@ module Neo4j::Server
     end
 
     def get(url, options={})
-      HTTParty.get(url, merged_options(options))
+      @connection.get(url, merged_options(options))
     end
 
     def post(url, options={})
-      HTTParty.post(url, merged_options(options))
+      @connection.post(url, merged_options(options))
     end
 
     def delete(url, options={})
-      HTTParty.delete(url, merged_options(options))
+      @connection.delete(url, merged_options(options))
     end
 
   end

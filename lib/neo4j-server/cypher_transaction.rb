@@ -20,7 +20,7 @@ module Neo4j::Server
       @commit_url = response['commit']
       @exec_url = response.headers['location']
       init_resource_data(response, url)
-      expect_response_code(response,201)
+      expect_response_code(response, 201, url)
       register_instance
     end
 
@@ -62,13 +62,13 @@ module Neo4j::Server
 
     def _delete_tx
       response = @endpoint.delete(@exec_url, headers: resource_headers)
-      expect_response_code(response,200)
+      expect_response_code(response, 200, url, @exec_url)
       response
     end
 
     def _commit_tx
       response = @endpoint.post(@commit_url, headers: resource_headers)
-      expect_response_code(response,200)
+      expect_response_code(response, 200, @commit_url)
       response
     end
   end
