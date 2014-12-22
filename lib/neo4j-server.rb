@@ -1,6 +1,4 @@
 require 'json'
-require 'faraday'
-require 'faraday_middleware'
 require 'typhoeus'
 require 'neo4j-server/resource'
 require 'neo4j-server/cypher_node'

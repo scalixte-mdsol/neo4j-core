@@ -111,17 +111,15 @@ module Neo4j::Server
           base_url = 'http://localhost:7474'
           params = [base_url, auth]
           session = Neo4j::Session.create_session(:server_db, params)
-          handlers = session.connection.builder.handlers.map(&:name)
-          expect(handlers).to include('Faraday::Request::BasicAuthentication')
+          expect(session.connection.basic_creds).to eq 'username:password'
         end
       end
 
       describe 'with auth params inside URL' do
         it 'creates session with basic auth params' do
-          url = 'http://username:password@localhost:7474'
+          url = 'http://username:password-foo@localhost:7474'
           session = Neo4j::Session.create_session(:server_db, url)
-          handlers = session.connection.builder.handlers.map(&:name)
-          expect(handlers).to include('Faraday::Request::BasicAuthentication')
+          expect(session.connection.basic_creds).to eq 'username:password-foo'
         end
       end
 
@@ -133,11 +131,11 @@ module Neo4j::Server
 
           params = [base_url, init_params_false]
           session_false = Neo4j::Session.create_session(:server_db, params)
-          expect(session_false.connection.ssl.verify).to be_falsey
+          expect(session_false.connection.verify_ssl?).to be_falsey
 
           params = [base_url, init_params_true]
           session_true = Neo4j::Session.create_session(:server_db, params)
-          expect(session_true.connection.ssl.verify).to be_truthy
+          expect(session_true.connection.verify_ssl?).to be_truthy
         end
       end
 

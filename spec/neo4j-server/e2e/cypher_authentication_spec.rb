@@ -87,8 +87,8 @@ describe 'Neo4j::Server::CypherAuthentication', if: (ENV['TEST_AUTHENTICATION'] 
       end
 
       it 'informs of a required password change' do
-        response_double = double('A Faraday connection object')
-        expect_any_instance_of(Faraday::Connection).to receive(:post).and_return(response_double)
+        response_double = double('A Neo4j HTTP Connection')
+        expect_any_instance_of(Neo4j::Server::Connection).to receive(:post).and_return(response_double)
         expect(response_double).to receive(:body).and_return({ 'password_change_required' => true })
         expect { Neo4j::Session.open(:server_db, 'http://localhost:7474', basic_auth: { username: 'neo4j', password: @suite_default }) }
           .to raise_error Neo4j::Server::CypherAuthentication::PasswordChangeRequiredError
@@ -150,7 +150,7 @@ describe 'Neo4j::Server::CypherAuthentication', if: (ENV['TEST_AUTHENTICATION'] 
       let(:auth_object) { Neo4j::Server::CypherAuthentication.new('http://localhost:7474') }
 
       it 'can create a new, dedicated auth connection' do
-        expect(auth_object.connection).to be_a(Faraday::Connection)
+        expect(auth_object.connection).to be_a(Neo4j::Server::Connection)
       end
 
       it 'allows manual setting of basic auth params' do
@@ -165,7 +165,7 @@ describe 'Neo4j::Server::CypherAuthentication', if: (ENV['TEST_AUTHENTICATION'] 
           expect(auth_object.invalidate_token(:foo)['errors'][0]['code']).to eq 'Neo.ClientError.Security.AuthenticationFailed'
         end
 
-        # Here, we're demonstrating that existing sessions with the server -- sessions with their own CypherAuthentication and Faraday::Connection objects --
+        # Here, we're demonstrating that existing sessions with the server -- sessions with their own CypherAuthentication and Neo4j::Server::Connection objects --
         # are broken and required to reauthenticate when their tokens are invalidated.
         # We establish a new session, create a node, prove that it is valid and can be loaded, invalidate the token, and then get an error when we try
         # something that worked just a moment before.

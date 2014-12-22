@@ -106,7 +106,6 @@ module Neo4j::Server
         data = @data.first['row'].first
         #data.is_a?(Hash) ? {'data' => data, 'id' => id} : data
       else
-        # binding.pry
         data = @data[0][0]
         data.is_a?(Hash) ? add_entity_id(data) : data
       end

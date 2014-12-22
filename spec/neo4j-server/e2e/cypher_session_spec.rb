@@ -22,14 +22,8 @@ module Neo4j::Server
         Neo4j::Session.set_current(@before_session)
       end
 
-      it 'can use a user supplied faraday connection for a new session' do
-        connection = Faraday.new do |b|
-          b.request :json
-          b.response :json, :content_type => "application/json"
-          b.adapter  Faraday.default_adapter
-        end
-        connection.headers = {'Content-Type' => 'application/json'}
-
+      it 'can use a user supplied Neo4j::Server::Connection object for a new session' do
+        connection = Neo4j::Server::Connection.new
         expect(connection).to receive(:get).at_least(:once).and_call_original
         session = Neo4j::Session.open(:server_db, 'http://localhost:7474', { connection: connection })
       end

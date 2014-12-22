@@ -1,6 +1,7 @@
 module Neo4j::Server
   class ConnectionResponse
     attr_reader :response, :endpoint
+    EMPTY = ''
 
     def initialize(response, endpoint)
       @response = response
@@ -12,7 +13,7 @@ module Neo4j::Server
     end
 
     def body
-      @body ||= JSON.parse!(response.body)
+      @body ||= response.body.empty? ? EMPTY : JSON.parse!(response.body)
     end
 
     def headers

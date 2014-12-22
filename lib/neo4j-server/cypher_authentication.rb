@@ -40,8 +40,10 @@ module Neo4j::Server
                     nil
                   elsif auth_response.body.is_a?(String)
                     JSON.parse(auth_response.body)['errors'][0]['code'] == 'Neo.ClientError.Security.AuthorizationFailed' ? auth_attempt : nil
+                  elsif auth_response.body.is_a?(Hash)
+                    auth_response.body.has_key?('errors') ? auth_attempt : auth_response
                   else
-                    auth_response
+                    nil
                   end
       return nil if auth_hash.nil?
       add_auth_headers(token_or_error(auth_hash))
@@ -103,13 +105,7 @@ module Neo4j::Server
     end
 
     def self.new_connection
-      conn = Faraday.new do |b|
-        b.request :json
-        b.response :json, :content_type => "application/json"
-        b.use Faraday::Adapter::NetHttpPersistent
-      end
-      conn.headers = { 'Content-Type' => 'application/json' }
-      conn
+      Neo4j::Server::Connection.new
     end
 
     def new_connection

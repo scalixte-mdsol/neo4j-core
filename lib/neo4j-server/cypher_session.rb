@@ -21,22 +21,9 @@ module Neo4j::Server
     end
 
     # @param [Hash] params could be empty or contain basic authentication user and password
-    # @return [Faraday]
-    # @see https://github.com/lostisland/faraday
+    # @return Neo4j::Session::Connection
     def self.create_connection(params)
-      init_params = params[:initialize] and params.delete(:initialize)
-      # conn = Faraday.new(init_params) do |b|
-      #   b.request :basic_auth, params[:basic_auth][:username], params[:basic_auth][:password] if params[:basic_auth]
-      #   b.request :json
-      #   #b.response :logger
-      #   b.response :json, :content_type => "application/json"
-      #   #b.use Faraday::Response::RaiseError
-      #   b.use Faraday::Adapter::NetHttpPersistent
-      #   # b.adapter  Faraday.default_adapter
-      # end
-      # conn.headers = { 'Content-Type' => 'application/json', 'User-Agent' => ::Neo4j::Session.user_agent_string }
-      # conn
-      Neo4j::Server::Connection.new
+      Neo4j::Server::Connection.new(params)
     end
 
     # Opens a session to the database
@@ -49,7 +36,7 @@ module Neo4j::Server
       connection = params[:connection] || create_connection(params)
       url = endpoint_url || 'http://localhost:7474'
       auth_obj = CypherAuthentication.new(url, connection, params)
-      # auth_obj.authenticate
+      auth_obj.authenticate
       response = connection.get(url)
       raise "Server not available on #{url} (response code #{response.response_code})" unless response.status == 200
       establish_session(response.body, connection, auth_obj)
@@ -191,11 +178,9 @@ module Neo4j::Server
       Neo4j::Transaction.current ? r : r['data']
     end
 
-    require 'pry'
     def _query_or_fail(q, single_row = false, params=nil)
       response = _query(q, params)
       response.raise_error if response.error?
-      # binding.pry
       single_row ? response.first_data : response
     end
 
