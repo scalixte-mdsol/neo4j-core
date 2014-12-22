@@ -106,6 +106,7 @@ module Neo4j::Server
         data = @data.first['row'].first
         #data.is_a?(Hash) ? {'data' => data, 'id' => id} : data
       else
+        # binding.pry
         data = @data[0][0]
         data.is_a?(Hash) ? add_entity_id(data) : data
       end
@@ -168,7 +169,6 @@ module Neo4j::Server
       raise Neo4j::Session::CypherError.new(@error_msg, @error_code, @error_status)
     end
 
-
     def self.create_with_no_tx(response)
       case response.status
         when 200
@@ -176,7 +176,7 @@ module Neo4j::Server
         when 400
           CypherResponse.new(response).set_error(response.body['message'], response.body['exception'], response.body['fullname'])
         else
-          raise "Unknown response code #{response.status} for #{response.env[:url].to_s}"
+          raise "Unknown response code #{response.status} for #{response.endpoint}"
       end
     end
 

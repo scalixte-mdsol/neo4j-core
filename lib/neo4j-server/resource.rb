@@ -35,7 +35,7 @@ module Neo4j
       end
 
       def handle_response_error(response, msg="Error for request" )
-        raise ServerException.new("#{msg} #{response.env && response.env[:url].to_s}, #{response.status}, #{response.status}")
+        raise ServerException.new("#{msg} #{response.endpoint && response.endpoint}, #{response.status}, #{response.status}")
       end
 
       def expect_response_code(response, expected_code, msg="Error for request" )

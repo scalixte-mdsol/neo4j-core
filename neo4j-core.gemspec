@@ -35,6 +35,7 @@ Neo4j-core provides classes and methods to work with the graph database Neo4j.
   s.add_dependency("os")  # for Rake task
   s.add_dependency("zip") # for Rake task
   s.add_dependency("activesupport") # For ActiveSupport::Notifications
+  s.add_dependency('typhoeus')
 
   if RUBY_PLATFORM == 'java'
     s.add_dependency("neo4j-community", '~> 2.1.1')

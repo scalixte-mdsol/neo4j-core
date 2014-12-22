@@ -53,7 +53,6 @@ module Neo4j::Server
 
     def _commit_tx
       response = @connection.post(@commit_url)
-
       expect_response_code(response,200)
       response
     end
