@@ -34,7 +34,7 @@ module Neo4j
       end
 
       def expect_response_code(response, expected_code, msg = 'Error for request')
-        handle_response_error(response, "Expected response code #{expected_code} #{msg}") unless response.status == expected_code
+        handle_response_error(response, "Expected response code #{expected_code} #{msg}, body: #{response.body}") unless response.status == expected_code
         response
       end
 
