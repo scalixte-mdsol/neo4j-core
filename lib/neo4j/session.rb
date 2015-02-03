@@ -1,8 +1,12 @@
 module Neo4j
   class Session
+    class << self
+      attr_accessor :all_sessions
+      attr_accessor :factories
+    end
     @@current_session = nil
-    @@all_sessions = {}
-    @@factories = {}
+    self.all_sessions = {}
+    self.factories = {}
 
     # @abstract
     def close
@@ -105,10 +109,10 @@ module Neo4j
 
       # @private
       def create_session(db_type, params = {})
-        unless @@factories[db_type]
-          fail "Can't connect to database '#{db_type}', available #{@@factories.keys.join(',')}"
+        unless factories[db_type]
+          fail "Can't connect to database '#{db_type}', available #{factories.keys.join(',')}"
         end
-        @@factories[db_type].call(*params)
+        factories[db_type].call(*params)
       end
 
       # @return [Neo4j::Session] the current session
@@ -129,7 +133,7 @@ module Neo4j
 
       # Returns a session with given name or else raise an exception
       def named(name)
-        @@all_sessions[name] || fail("No session named #{name}.")
+        all_sessions[name] || fail("No session named #{name}.")
       end
 
       # Sets the session to be used as default
@@ -166,8 +170,8 @@ module Neo4j
 
       # @private
       def _listeners
-        @@listeners ||= []
-        @@listeners
+        listeners ||= []
+        listeners
       end
 
       # @private
@@ -182,7 +186,7 @@ module Neo4j
         elsif default.nil?
           set_current(session) unless @@current_session
         end
-        @@all_sessions[name] = session if name
+        all_sessions[name] = session if name
         session
       end
 
@@ -192,13 +196,13 @@ module Neo4j
       end
 
       def inspect
-        "Neo4j::Session available: #{@@factories && @@factories.keys}"
+        "Neo4j::Session available: #{factories && factories.keys}"
       end
 
       # @private
       def register_db(db, &session_factory)
-        puts "replace factory for #{db}" if @@factories[db]
-        @@factories[db] = session_factory
+        puts "replace factory for #{db}" if factories[db]
+        factories[db] = session_factory
       end
     end
   end
