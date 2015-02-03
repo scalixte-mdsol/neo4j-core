@@ -4,7 +4,7 @@ module Neo4j
       attr_accessor :all_sessions
       attr_accessor :factories
     end
-    @@current_session = nil
+    @@current = nil
     self.all_sessions = {}
     self.factories = {}
 
@@ -117,7 +117,7 @@ module Neo4j
 
       # @return [Neo4j::Session] the current session
       def current
-        @@current_session
+        @@current
       end
 
       # Returns the current session or raise an exception if no session is available
@@ -139,7 +139,7 @@ module Neo4j
       # Sets the session to be used as default
       # @param [Neo4j::Session] session the session to use
       def set_current(session)
-        @@current_session = session
+        @@current = session
       end
 
       # Registers a callback which will be called immediately if session is already available,
@@ -184,7 +184,7 @@ module Neo4j
         if default == true
           set_current(session)
         elsif default.nil?
-          set_current(session) unless @@current_session
+          set_current(session) unless @@current
         end
         all_sessions[name] = session if name
         session
@@ -192,7 +192,7 @@ module Neo4j
 
       # @private
       def unregister(session)
-        @@current_session = nil if @@current_session == session
+        @@current = nil if @@current == session
       end
 
       def inspect
